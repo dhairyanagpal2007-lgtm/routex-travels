@@ -464,3 +464,10 @@ footer {
         font-size: 22px;
     }
 }
+.disclaimer {
+    font-size: 11px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 12px;
+    padding: 0 15px 10px;
+}
