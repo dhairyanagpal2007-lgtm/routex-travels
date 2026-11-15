@@ -42,6 +42,28 @@
         #error {
             color: red;
         }
+
+        body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-disclaimer {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    margin-top: auto;
+}
+
+.project-disclaimer p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
     </style>
 </head>
 
@@ -111,6 +133,19 @@ document.getElementById("loginForm").addEventListener("submit", async event => {
     }
 });
 </script>
+
+
+<footer class="project-disclaimer">
+    <p>
+        Disclaimer: This is a non-commercial academic 
+        college project built strictly for educational
+        and demonstration purposes. All hotel listings,
+        prices, payment options, and bookings are simulated,
+        and no real financial transactions take place
+        on this website.
+    </p>
+</footer>
+
 
 </body>
 </html>
