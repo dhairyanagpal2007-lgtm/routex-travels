@@ -1,4 +1,3 @@
-
 "use strict";
 
 const API = "/api";
@@ -20,6 +19,49 @@ function escapeHTML(value) {
 function formatCurrency(amount) {
     return "₹" + Number(amount || 0).toLocaleString("en-IN", {
         maximumFractionDigits: 2
+    });
+}
+
+// Format date-only values without timezone shifting the selected calendar day.
+function formatBookingDate(value) {
+    if (value === null || value === undefined || value === "") {
+        return "Not provided";
+    }
+
+    const dateText = String(value).trim();
+    const dateMatch = dateText.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (dateMatch) {
+        const year = Number(dateMatch[1]);
+        const month = Number(dateMatch[2]);
+        const day = Number(dateMatch[3]);
+        const date = new Date(year, month - 1, day);
+
+        if (
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 &&
+            date.getDate() === day
+        ) {
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        return "Not provided";
+    }
+
+    const parsedDate = new Date(dateText);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "Not provided";
+    }
+
+    return parsedDate.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
     });
 }
 
@@ -149,7 +191,6 @@ function updateTotalPayment(bookings) {
 
 // ================================================
 // 5. DISPLAY GUEST PERSONAL DETAILS
-// Aadhaar/PAN and Demo fields removed
 // ================================================
 
 function getGuestIdentityHTML(guest) {
@@ -166,13 +207,14 @@ function getGuestIdentityHTML(guest) {
     const message = cleanMessage
         ? escapeHTML(cleanMessage).replace(/\r?\n/g, "<br>")
         : "No message provided";
-        const demoCode1 = guest.demoCode1
-    ? escapeHTML(String(guest.demoCode1))
-    : "Not provided";
 
-const demoCode2 = guest.demoCode2
-    ? escapeHTML(String(guest.demoCode2))
-    : "Not provided";
+    const demoCode1 = guest.demoCode1
+        ? escapeHTML(String(guest.demoCode1))
+        : "Not provided";
+
+    const demoCode2 = guest.demoCode2
+        ? escapeHTML(String(guest.demoCode2))
+        : "Not provided";
 
     return `
         <div style="
@@ -195,14 +237,14 @@ const demoCode2 = guest.demoCode2
             </div>
 
             <div>
-    <strong>Aadhaar – Last 4 Digits (Demo Only):</strong>
-    ${demoCode1}
-</div>
+                <strong>Aadhaar – Last 4 Digits (Demo Only):</strong>
+                ${demoCode1}
+            </div>
 
-<div>
-    <strong>PAN – Demo Code:</strong>
-    ${demoCode2}
-</div>
+            <div>
+                <strong>PAN – Demo Code:</strong>
+                ${demoCode2}
+            </div>
 
             <div style="
                 margin-top:8px;
@@ -453,7 +495,7 @@ async function loadBookings() {
     if (bookings.length === 0) {
         table.innerHTML = `
             <tr>
-                <td colspan="12">No bookings found.</td>
+                <td colspan="15">No bookings found.</td>
             </tr>
         `;
         return;
@@ -468,8 +510,9 @@ async function loadBookings() {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-    <td>${index + 1}</td>
-    <td>${escapeHTML(booking.id)}</td>
+            <td>${index + 1}</td>
+
+            <td>${escapeHTML(booking.id)}</td>
 
             <td>${escapeHTML(booking.name)}</td>
 
@@ -482,6 +525,10 @@ async function loadBookings() {
             <td>${formatCurrency(booking.hotel_price)}</td>
 
             <td>${escapeHTML(booking.nights)}</td>
+
+            <td>${formatBookingDate(booking.check_in_date ?? booking.checkInDate)}</td>
+
+            <td>${formatBookingDate(booking.check_out_date ?? booking.checkOutDate)}</td>
 
             <td>${formatCurrency(booking.amount)}</td>
 
